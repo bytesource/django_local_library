@@ -124,14 +124,47 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
-
-STATIC_URL = '/static/'
-
 # Redirect to home URL after login (Default redirects to /accounts/profile/).
 # http://stackoverflow.com/questions/23772001/redirect-after-login-simply-appends-login-redirect-url
 LOGIN_REDIRECT_URL = '/'
 
 # Sends email to console for testing purposes.
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Heroku
+# ================
+# Heroku recommends that developers use the dj-database-url package 
+# to parse the DATABASE_URL environment variable and 
+# automatically convert it to Django’s desired configuration format.
+import dj_database_url
+db_from_env = dj_database_url.config(conn_max_age=500)
+# The value conn_max_age=500 makes the connection persistent, 
+# which is far more efficient than recreating the connection on every request cycle. 
+# This is however optional, and can be removed if needed.
+DATABASES['default'].update(db_from_env)
+# We'll still be using SQLite during development because the DATABASE_URL environment variable 
+# will not be set on our development computer.
+
+# NOTE: Django needs psycopg2 to work with Postgres databases (we cannot use SQLite on Heroku),
+#       and you will need to add this to the requirements.txt 
+#       for Heroku to set this up on the remote server.
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.10/howto/static-files/
+STATIC_URL = '/static/'
+
+# The absolute path to the directory where collectstatic will collect static files for deployment.
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# The URL to use when referring to static files (where they will be served from)
+STATIC_URL = '/static/'
+
+# NOTE: Heroku automatically calls collectstatic and prepares your static files 
+#       for use by WhiteNoise (https://pypi.org/project/whitenoise/) after it uploads your application.
+# 1. pip3 install whitenoise
+# 2. See locallibrary/wsgi.py
+
+
+# Simplified static file serving
+# https://warehouse.python.org/project/whitenoise
+STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'

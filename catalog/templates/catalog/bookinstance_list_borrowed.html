@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Borrowed Books</h1>
+
+    {% if perms.catalog.can_mark_returned %}
+
+    <ul>
+        {% for instance in bookinstance_list %}
+
+        <li class="{% if instance.is_overdue %}text-danger{% endif %}">
+            <a href="{% url 'renew-book-librarian' instance.id %}">[Renew]</a>
+            <a href="{% url 'book-detail' instance.book.pk %}">{{ instance.book.title }}</a> ({{ instance.due_back }}) - {{ instance.borrower }}
+        </li>
+
+        {% endfor %}
+
+    {% else %}
+    {# 'else' clause not needed as user is directed to the login page in case of no permission #}
+    <p>You have no permission to see the content of this site.</p>
+
+    {% endif %}
+
+{% endblock %}

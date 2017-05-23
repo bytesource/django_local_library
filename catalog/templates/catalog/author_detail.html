@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Title: {{ author.title }}</h1>
+
+<p><strong>Name:</strong> {{author.last_name}}, {{author.first_name}} 
+{% if perms.catalog.can_renew %}
+(<a href="{% url 'author_update' author.pk %}">Edit</a>, <a href="{% url 'author_delete' author.pk %}">Delete</a>)
+{% endif %}
+</p>
+{% if author.date_of_birth %}
+<p><strong>Date of Birth:</strong> {{ author.date_of_birth }}</p>
+{% endif %}
+{% if author.date_of_death %}
+<p><strong>Date of Death:</strong> {{ author.date_of_death }}</p>
+{% endif %}
+
+<div style="margin-left:20px;margin-top:20px">
+    <h4>Books</h4>
+
+    <!--
+    bookinstance_set() - <lowercase name of model with foreign key>_set
+    Reverse-lookup of book instances belonging to a book object.
+    Explanation:
+    The foreign key for the one-to-many relationship is set on BookInstance, the 'one' site of relationship.
+    Since you don't do anything to declare the relationship in the other ("many") model (Book in this case)
+    Django doesn't have any field to get the set of associated records.
+    -->
+    {% for book in author.book_set.all %}
+    <hr>
+    <p><strong>Title: </strong><a href="{{ book.get_absolute_url }}">{{ book.title}}</a> <strong>({{ book.bookinstance_set.count }} in library)</strong>
+    <!--
+    Tried to call the function, book.display_genre(), 
+    but Django complained it couldn't parse the ().
+    -->
+    <p><strong>Genre: </strong>{{ book.display_genre}}
+    <p><strong>Summary: </strong>{{ book.summary}}
+    </p>
+    <p class="text-muted">
+        <strong>ISBN:</strong> {{ book.isbn }}
+    </p>
+    {% endfor %}
+</div>
+{% endblock %}
